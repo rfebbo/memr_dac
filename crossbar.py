@@ -3,6 +3,15 @@ import regex as re
 import pandas as pd
 import numpy as np
 
+# A virtual memristive crossbar with precision, memristor programming based on experimental data, and multiplication
+# precision sets the number of bits the DAC would have
+# shape is the shape of the crossbar
+# max_attempts is the number of programming attemts
+    # this is required because when a cell is programmed, a random sample from experimental data is chosen
+    # this sample is chosen from a list of resistances collected from a specific voltage at the gate of a 1t1r
+    # for more information see characterize_analog.ipynb
+# threshold is the percentage from the median resistance a programming 
+    # attempt must be within to return before max_attempts is reached
 class Crossbar:
     def __init__(self, precision, shape, max_attempts, threshold):
         self.__precision = precision
@@ -87,10 +96,17 @@ class Crossbar:
 
     def set_values(self, values):
         if np.max(values) > 2**self.__precision:
-            print('Programmed value exceeds maximum based on precision')
+            print('Requested value to program exceeds maximum based on precision')
         else:
             self.__values = values
             self.__resistances, self.__errors = self.__program_array(self.__values, self.__precision)
+
+    def set_value(self, value, n_i, m_i):
+        if value > 2**self.__precision:
+            print('Requested value to program exceeds maximum based on precision')
+        else:
+            v_idx = int(200 * (value / (2**self.__precision)))
+            self.__resistances[n_i, m_i] = self.__program_cell(v_idx, self.__max_attempts, self.__threshold)
 
     def get_resistance(self, voltage_idx):
         return self.__r_b_v[voltage_idx][np.random.choice(len(self.__r_b_v[voltage_idx]))]
