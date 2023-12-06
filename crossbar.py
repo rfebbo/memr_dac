@@ -25,10 +25,6 @@ class Crossbar:
         self.__r_b_v = self.__make_r_b_v()
         self.__medians = np.median(self.__r_b_v, axis=1)
         self.__resistances, self.__errors = self.__program_array(self.__values, self.__precision, self.__max_attempts, self.__threshold)
-        print(f'resistances:\n {self.__resistances}')
-        print(f'values:\n {self.__values}')
-        print(f'errors:\n {self.__errors}')
-        print(f'average error:\n {np.mean(self.__errors)}')
 
     def __make_r_b_v(self):
         temps = []
@@ -93,6 +89,12 @@ class Crossbar:
                 break
 
         return resistance, error
+    
+    def print_info(self):
+        print(f'resistances:\n {self.__resistances}')
+        print(f'values:\n {self.__values}')
+        print(f'errors:\n {self.__errors}')
+        print(f'average error:\n {np.mean(self.__errors)}')
 
     def set_values(self, values):
         if np.max(values) > 2**self.__precision:
